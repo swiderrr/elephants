@@ -19,10 +19,6 @@ class ElephantProgram:
         self.original = [int(x) for x in lines[2].split()]
         self.moved = [int(x) for x in lines[3].split()]
 
-    def run(self):
-        return self.cycle_parameters(self.get_simple_cycles())
-
-
     def get_simple_cycles(self):
         visited = [False for i in range(self.n)]
         cycle = {}
@@ -34,14 +30,13 @@ class ElephantProgram:
                     visited[x] = True
                     cycle[i].append(self.original[x])
                     x = self.moved.index(self.original[x])
-                    print(visited)
         return cycle
 
     # Wyznaczanie parametrów cykli
-    def cycle_parameters(self, lines):
+    def cycle_parameters(self):
         cycles_dict = self.get_simple_cycles()
         w = 0
-        for i in range(len(cycles_dict)):
+        for i, _ in enumerate(cycles_dict):
             cycle_sum = 0
             cycle_minimum, global_minimum = 6500, min(self.weights)
             if len(cycles_dict[i]) > 1:
@@ -49,8 +44,9 @@ class ElephantProgram:
                     elephant_weight = self.weights[e - 1]
                     cycle_sum = cycle_sum + elephant_weight
                     cycle_minimum = min(cycle_minimum, elephant_weight)
-
                 global_minimum = min(global_minimum, cycle_minimum)
+
+                #Obliczenie wynikow obiema metodami
                 method_one = cycle_sum + (len(cycles_dict[i]) - 2) * cycle_minimum
                 method_two = cycle_sum + cycle_minimum + (len(cycles_dict[i]) + 1) * global_minimum
 
@@ -59,4 +55,5 @@ class ElephantProgram:
         return w
 
 program = ElephantProgram(sys.stdin.readlines())
-print(program.run())
+print(program.cycle_parameters())
+
