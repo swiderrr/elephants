@@ -7,7 +7,7 @@ def test():
     for i in range(len(in_list)):
         lines = open(in_list[i]).readlines()
         program = ElephantProgram(lines)
-        if program.run() == int(open(out_list[i]).read()):
+        if program.cycle_parameters() == int(open(out_list[i]).read()):
             true_list.append(True)
     assert all(true_list) == True
 
@@ -18,6 +18,8 @@ class ElephantProgram:
         self.weights = [int(x) for x in lines[1].split()]
         self.original = [int(x) for x in lines[2].split()]
         self.moved = [int(x) for x in lines[3].split()]
+        self.moved_as_dict = dict(zip(self.moved, range(0, len(self.moved))))
+        self.global_minimum = min(self.weights)
 
     def get_simple_cycles(self):
         visited = [False for i in range(self.n)]
@@ -29,7 +31,7 @@ class ElephantProgram:
                 while not visited[x]:
                     visited[x] = True
                     cycle[i].append(self.original[x])
-                    x = self.moved.index(self.original[x])
+                    x = self.moved_as_dict[self.original[x]]
         return cycle
 
     # Wyznaczanie parametrów cykli
@@ -38,13 +40,13 @@ class ElephantProgram:
         w = 0
         for i, _ in enumerate(cycles_dict):
             cycle_sum = 0
-            cycle_minimum, global_minimum = 6500, min(self.weights)
+            cycle_minimum = 6501
             if len(cycles_dict[i]) > 1:
                 for e in cycles_dict[i]:
                     elephant_weight = self.weights[e - 1]
                     cycle_sum = cycle_sum + elephant_weight
                     cycle_minimum = min(cycle_minimum, elephant_weight)
-                global_minimum = min(global_minimum, cycle_minimum)
+                global_minimum = min(self.global_minimum, cycle_minimum)
 
                 #Obliczenie wynikow obiema metodami
                 method_one = cycle_sum + (len(cycles_dict[i]) - 2) * cycle_minimum
